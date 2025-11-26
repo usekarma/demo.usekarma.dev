@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logout from all usekarma.dev apps</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: rgba(10, 14, 30, 0.92);
+      border-radius: 16px;
+      padding: 24px 28px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: left;
+    }
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: 1.4rem;
+    }
+    p {
+      margin: 0.3rem 0;
+      line-height: 1.4;
+      color: #d0d0e0;
+      font-size: 0.95rem;
+    }
+    .apps-list {
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+      color: #b8b8d0;
+    }
+    .apps-list code {
+      font-size: 0.85em;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: #3c82ff;
+      color: white;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    }
+    button:hover {
+      filter: brightness(1.08);
+    }
+    .hint {
+      margin-top: 0.85rem;
+      font-size: 0.82rem;
+      color: #a4a4c0;
+    }
+    a {
+      color: #8bc5ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Log out of all usekarma.dev apps</h1>
+    <p>
+      Clicking the button below will open logout pages for all configured
+      <code>*.usekarma.dev</code> apps in new tabs. Each tab runs its own
+      logout flow and then you can close them.
+    </p>
+    <div class="apps-list">
+      This will log you out from:
+      <ul>
+        <li><code>grafana.usekarma.dev</code></li>
+        <li><code>clickhouse.usekarma.dev</code></li>
+        <li><code>prometheus.usekarma.dev</code></li>
+        <li><code>mongo.usekarma.dev</code></li>
+        <li><code>redpanda.usekarma.dev</code></li>
+      </ul>
+    </div>
+    <button id="logout-all">Log out of all apps</button>
+    <p class="hint">
+      Your browser may open several tabs. After they finish loading,
+      you should be logged out everywhere. You can then
+      <a id="return-link" href="/">return to the main demo site</a>.
+    </p>
+  </div>
+
+  <script>
+    // These are the logout endpoints you said already exist and work:
+    const APP_LOGOUT_URLS = [
+      "https://grafana.usekarma.dev/logout",
+      "https://clickhouse.usekarma.dev/logout",
+      "https://prometheus.usekarma.dev/logout",
+      "https://mongo.usekarma.dev/logout",
+      "https://redpanda.usekarma.dev/logout"
+    ];
+
+    // OPTIONAL: if you also want to hit Cognito hosted logout, set this:
+    // const COGNITO_LOGOUT_URL =
+    //   "https://<your-cognito-domain>/logout" +
+    //   "?client_id=<your-app-client-id>" +
+    //   "&logout_uri=" + encodeURIComponent("https://demo.usekarma.dev/");
+
+    document.getElementById("logout-all").addEventListener("click", () => {
+      console.log("[logout-all] Firing logout for apps:", APP_LOGOUT_URLS);
+
+      // 1) Fan out to each app in a new tab/window (top-level navigation => cookies sent)
+      APP_LOGOUT_URLS.forEach(url => {
+        try {
+          window.open(url, "_blank", "noopener,noreferrer");
+        } catch (e) {
+          console.error("[logout-all] Failed to open logout URL:", url, e);
+        }
+      });
+
+      // 2) Optionally also open Cognito logout in a tab
+      // if (typeof COGNITO_LOGOUT_URL === "string") {
+      //   try {
+      //     window.open(COGNITO_LOGOUT_URL, "_blank", "noopener,noreferrer");
+      //   } catch (e) {
+      //     console.error("[logout-all] Failed to open Cognito logout URL:", e);
+      //   }
+      // }
+    });
+  </script>
+</body>
+</html>
